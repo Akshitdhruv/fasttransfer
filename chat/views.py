@@ -66,16 +66,17 @@ def createimg(req,s):
     print(msg,"msgg")        
     me=msg.rfind("/")
     message=msg[me+1:len(msg)]
-    ms="https://fasttransfer.herokuapp.com/media/media/"+str(message)
+    ms="media/media/"+str(message)
     r_size=r_size+round(os.path.getsize(ms)/1024,2)
-    dir="https://fasttransfer.herokuapp.com/media/media/"
+    dir="media/media/"
     oldpwd=os.getcwd()
     filters =[{'id': FILTER_DEFLATE}]
-    archive = SevenZipFile("https://fasttransfer.herokuapp.com/media/"+str(message)+".7z", mode='w', filters=filters)
+    archive = SevenZipFile("media/"+str(message)+".7z", mode='w', filters=filters)
     os.chdir(dir)
     archive.write(str(message))
     archive.close()
     os.chdir(oldpwd)
+
 
     Message.objects.filter(value=new_message.value).delete()
     new_message = Message.objects.create(value=str(message)+".7z", user=s[1], room=s[2],send_size=0,receive_size=0,ip_add="")
@@ -83,7 +84,7 @@ def createimg(req,s):
     msg=str(new_message.value.url)        
     me=msg.rfind("/")
     message=msg[me+1:len(msg)]
-    ms="https://fasttransfer.herokuapp.com/media/"+str(message)
+    ms="media/"+str(message)
     size = round(os.path.getsize(ms)/1024,2)
     
     new_message.send_size=size 
@@ -104,7 +105,7 @@ def send(request):
         message = request.FILES['message'] 
         room_id = request.POST['room_id']
         try:
-            for f in glob.iglob(os.path.join("https://fasttransfer.herokuapp.com/media/media/", '*')):
+            for f in glob.iglob(os.path.join("media/media/", '*')):
                 remove(f)
         except Exception:
             pass
@@ -119,7 +120,7 @@ def send(request):
         """global number
         name="samples"+str(number)
         number=number+1
-        shutil.make_archive("https://fasttransfer.herokuapp.com/media/"+name, 'zip', "media/media/")
+        shutil.make_archive("media/"+name, 'zip', "media/media/")
         new_message = Message.objects.create(value=name+".zip", user=username, room=room_id,size=0)
         msg=str(new_message.value.url)        
         me=msg.rfind("/")
@@ -147,22 +148,22 @@ def getMessages(request, room):
             x=i['value']
             z=x.rfind(".")
             
-            if x[0:z] not in glob.iglob(os.path.join("https://fasttransfer.herokuapp.com/media/media/", '*')):
+            if x[0:z] not in glob.iglob(os.path.join("media/media/", '*')):
                 try:
-                    archive = SevenZipFile('https://fasttransfer.herokuapp.com/media/'+i['value'], mode='r')
+                    archive = SevenZipFile('media/'+i['value'], mode='r')
                     x=i['value']
                     z=x.rfind(".")
-                    archive.extractall(path="https://fasttransfer.herokuapp.com/media/media/")
+                    archive.extractall(path="media/media/")
                     archive.close()
                     
-                    i['value']='https://fasttransfer.herokuapp.com/media/'+x[0:z]
+                    i['value']='media/'+x[0:z]
                     
                 except Exception:
                     pass
             else:
                 x=i['value']
                 z=x.rfind(".")
-                i['value']='https://fasttransfer.herokuapp.com/media/'+x[0:z]
+                i['value']='media/'+x[0:z]
 
         
     #archive = py7zr.SevenZipFile('E:/z.7z', mode='r')
