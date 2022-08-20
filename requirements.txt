@@ -66,4 +66,3 @@ wrapt==1.12.1
 zipp==3.1.0
 zope.interface==5.4.0
 py7zr
-torch
