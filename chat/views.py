@@ -56,14 +56,14 @@ def send(request):
             me=msg.rfind("/")
             message=msg[me+1:len(msg)]
             ms="E:/8th_sem_project/django-chat-app/media/media/"+str(message)"""
-        shutil.make_archive("E:/8th_sem_project/django-chat-app/media/sampless", 'zip', "E:/8th_sem_project/django-chat-app/media/media/")
+        shutil.make_archive("media/media/sampless", 'zip', "media/media/")
         
     
         new_message = Message.objects.create(value="sampless.zip", user=username, room=room_id,size=0)
         msg=str(new_message.value.url)        
         me=msg.rfind("/")
         message=msg[me+1:len(msg)]
-        ms="E:/8th_sem_project/django-chat-app/media/"+str(message)
+        ms="media/media/"+str(message)
 
        
         size = round(os.path.getsize(ms)/1024,2)
@@ -71,7 +71,7 @@ def send(request):
         new_message.size=size
         
         new_message.save() 
-        for f in glob.iglob(os.path.join("E:/8th_sem_project/django-chat-app/media/media/", '*')):
+        for f in glob.iglob(os.path.join("media/media/", '*')):
             os.remove(f)
         
     context=Message.objects.all()
