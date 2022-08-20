@@ -66,17 +66,17 @@ def createimg(req,s):
     print(msg,"msgg")        
     me=msg.rfind("/")
     message=msg[me+1:len(msg)]
-    ms="https://fasttransfer.herokuapp.com/app/media/media/"+str(message)
+    ms="/app/media/media/"+str(message)
     r_size=r_size+round(os.path.getsize(ms)/1024,2)
-    dir="https://fasttransfer.herokuapp.com/app/media/media/"
+    dir="/app/media/media/"
     oldpwd=os.getcwd()
     filters =[{'id': FILTER_DEFLATE}]
-    archive = SevenZipFile("https://fasttransfer.herokuapp.com/app/media/"+str(message)+".7z", mode='w', filters=filters)
+    archive = SevenZipFile("/app/media/"+str(message)+".7z", mode='w', filters=filters)
     os.chdir(dir)
     archive.write(str(message))
     archive.close()
     os.chdir(oldpwd)
-    dir="https://fasttransfer.herokuapp.com/app/media/"
+    dir="/app/media/"
     os.chdir(dir)
 
     Message.objects.filter(value=new_message.value).delete()
@@ -85,7 +85,7 @@ def createimg(req,s):
     msg=str(new_message.value.url)        
     me=msg.rfind("/")
     message=msg[me+1:len(msg)]
-    ms="https://fasttransfer.herokuapp.com/app/media/"+str(message)
+    ms="/app/media/"+str(message)
     size = round(os.path.getsize(ms)/1024,2)
     
     new_message.send_size=size 
@@ -106,7 +106,7 @@ def send(request):
         message = request.FILES['message'] 
         room_id = request.POST['room_id']
         try:
-            for f in glob.iglob(os.path.join("https://fasttransfer.herokuapp.com/app/media/media/", '*')):
+            for f in glob.iglob(os.path.join("/app/media/media/", '*')):
                 remove(f)
         except Exception:
             pass
@@ -149,22 +149,22 @@ def getMessages(request, room):
             x=i['value']
             z=x.rfind(".")
             
-            if x[0:z] not in glob.iglob(os.path.join("https://fasttransfer.herokuapp.com/app/media/media/", '*')):
+            if x[0:z] not in glob.iglob(os.path.join("/app/media/media/", '*')):
                 try:
-                    archive = SevenZipFile('https://fasttransfer.herokuapp.com/app/media/'+i['value'], mode='r')
+                    archive = SevenZipFile('/app/media/'+i['value'], mode='r')
                     x=i['value']
                     z=x.rfind(".")
-                    archive.extractall(path="https://fasttransfer.herokuapp.com/app/media/media/")
+                    archive.extractall(path="/app/media/media/")
                     archive.close()
                     
-                    i['value']='https://fasttransfer.herokuapp.com/app/media/'+x[0:z]
+                    i['value']='/app/media/'+x[0:z]
                     
                 except Exception:
                     pass
             else:
                 x=i['value']
                 z=x.rfind(".")
-                i['value']='https://fasttransfer.herokuapp.com/app/media/'+x[0:z]
+                i['value']='/app/media/'+x[0:z]
 
         
     #archive = py7zr.SevenZipFile('E:/z.7z', mode='r')
