@@ -76,8 +76,6 @@ def createimg(req,s):
     archive.write(str(message))
     archive.close()
     os.chdir(oldpwd)
-    dir="media/"
-    os.chdir(dir)
 
     Message.objects.filter(value=new_message.value).delete()
     new_message = Message.objects.create(value=str(message)+".7z", user=s[1], room=s[2],send_size=0,receive_size=0,ip_add="")
