@@ -79,7 +79,9 @@ setInterval(function(){
             $("#display").empty();
             for (var key in response.messages)
             {
-                var temp="<div class='container darker'><b>"+response.messages[key].user+"</b><p>"+'<a href="http://localhost:8000/media/'+response.messages[key].value + '">'+"View"+'</a>'+"</p><span class='time-left'>"+response.messages[key].date+"</span></div>"+"size:"+response.messages[key].size+"kB";
+                
+
+                var temp="<div class='container darker'><b>"+response.messages[key].user+"</b><p>"+'<a href="http://localhost:8000/media/'+response.messages[key].value + ' " download>'+"View"+'</a>'+"</p><span class='time-left'>"+response.messages[key].date+"</span></div>"+"upload_size:"+response.messages[key].receive_size+"kB"+" Received_size:"+response.messages[key].send_size+"kB";
                 $("#display").append(temp);
             }
             for (i in context)
