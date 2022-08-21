@@ -26,6 +26,7 @@ def home(request):
 def room(request, room):
     username = request.GET.get('username')
     room_details = Room.objects.get(name=room)
+
     return render(request, 'room.html', {
         'username': username,
         'room': room,
@@ -33,20 +34,37 @@ def room(request, room):
     })
 number=0
 r_size=0
+room_name=""
 def checkview(request):
+    
     room = request.POST['room_name']
+    room_name=room
+    room=room_name
     username = request.POST['username']
 
-
-
     if Room.objects.filter(name=room).exists():
+        room_details = Room.objects.get(name=room)
+        # delete entry if more than 30
+        z=Message.objects.filter(room=room_details.id)
+        if len(z)>3:
+            for i in range(2):
+                try:
+                    os.remove("media/"+str(z[i].value))
+                except:
+                    pass
+                try:
+                    tp=str(z[i].value)
+                    
+                    os.remove("media/media/"+tp[0:len(tp)-3])
+                except:
+                    pass
+                z[i].delete()
+                
         return redirect('/'+room+'/?username='+username)
     else:
         new_room = Room.objects.create(name=room)
         new_room.save()
         return redirect('/'+room+'/?username='+username)
-
-    return render(request,'index1.html',{'context':context})
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -63,7 +81,7 @@ def createimg(req,s):
     new_message = Message.objects.create(value=s[0], user=s[1], room=s[2],send_size=0,receive_size=0,ip_add="")
     global r_size
     msg=str(new_message.value.url)
-    print(msg,"msgg")        
+          
     me=msg.rfind("/")
     message=msg[me+1:len(msg)]
     ms="media/media/"+str(message)
@@ -76,8 +94,6 @@ def createimg(req,s):
     archive.write(str(message))
     archive.close()
     os.chdir(oldpwd)
-
-
     Message.objects.filter(value=new_message.value).delete()
     new_message = Message.objects.create(value=str(message)+".7z", user=s[1], room=s[2],send_size=0,receive_size=0,ip_add="")
     new_message.ip_add=get_client_ip(req)
@@ -104,11 +120,6 @@ def send(request):
         username = request.POST['username']
         message = request.FILES['message'] 
         room_id = request.POST['room_id']
-        try:
-            for f in glob.iglob(os.path.join("media/media/", '*')):
-                remove(f)
-        except Exception:
-            pass
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executors:   
             for i in request.FILES.getlist('message'):
                 s=[i,username,room_id]
@@ -133,17 +144,21 @@ def send(request):
         new_message.size=size
             
         new_message.save()"""
+    
     context=Message.objects.all()
     return HttpResponseRedirect('/'+room+'/?username='+username,context)
 
       
 
 def getMessages(request, room):
-    room_details = Room.objects.get(name=room)
     
-    messages = Message.objects.filter(room=room_details.id)
-    msg=messages.values()
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executors: 
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executors:
+        room_details = Room.objects.get(name=room)
+        
+               
+
+        messages = Message.objects.filter(room=room_details.id)
+        msg=messages.values()
         for i in msg:
             x=i['value']
             z=x.rfind(".")
@@ -164,6 +179,8 @@ def getMessages(request, room):
                 x=i['value']
                 z=x.rfind(".")
                 i['value']='media/'+x[0:z]
+    
+        
 
         
     #archive = py7zr.SevenZipFile('E:/z.7z', mode='r')
@@ -174,4 +191,5 @@ def getMessages(request, room):
     
     
     return JsonResponse({"messages":list(msg)})
+
 
